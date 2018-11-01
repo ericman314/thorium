@@ -43,16 +43,8 @@ export class System {
     this.damage = new Damage(params.damage || {});
     this.extra = params.extra || false;
     this.locations = params.locations || [];
-    this.requiredDamageSteps = [];
-    this.optionalDamageSteps = [];
-    params.requiredDamageSteps &&
-      params.requiredDamageSteps.forEach(s =>
-        this.requiredDamageSteps.push(new DamageStep(s))
-      );
-    params.optionalDamageSteps &&
-      params.optionalDamageSteps.forEach(s =>
-        this.optionalDamageSteps.push(new DamageStep(s))
-      );
+    this.requiredDamageSteps = (params.requiredDamageSteps || []).map(s => new DamageStep(s));
+    this.optionalDamageSteps = (params.optionalDamageSteps || []).map(s => new DamageStep(s));
   }
   get stealthFactor() {
     return null;
@@ -77,6 +69,7 @@ export class System {
     }
   }
   setDefaultPowerLevel(level) {
+    // TODO: Should this be limited to 0 .. this.power.powerLevels.length - 1?
     this.power.defaultLevel = level;
   }
   break(report, destroyed, which) {
@@ -84,7 +77,7 @@ export class System {
     if (destroyed) this.damage.destroyed = true;
     this.damage.report = processReport(report, this);
     this.damage.requested = false;
-    this.damage.currentStep = 0;
+    this.damage.currentStep = 0;  
     this.damage.which = which;
   }
   addDamageStep({ name, args, type }) {
